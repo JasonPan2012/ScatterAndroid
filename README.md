@@ -7,7 +7,7 @@ ScatterAndroid simulates Scatter plugin for EOS blockchain in WebView, and allow
  
 ## Installation
 ### Step 1: Add library
-You can download a jar from GitHub's [releases page](https://github.com/mariabeyrak/ScatterAndroid/releases).
+You can download a jar from GitHub's [releases page](https://github.com/paytomat/ScatterAndroid/releases).
 
 Or use Gradle:
 ```groovy
@@ -18,7 +18,7 @@ allprojects {
 }
 
 dependencies {
-    implementation 'com.github.mariabeyrak:ScatterAndroid:1.0.0'
+    implementation 'com.github.paytomat:ScatterAndroid:2.0.0'
 }
 ``` 
 
@@ -37,8 +37,11 @@ private ScatterClient scatterClient = new ScatterClient() {
 
 Create ```Scatter``` object, where ```webView``` - is your WebView:
  ```java
- Scatter scatterImplementation = new Scatter(webView, scatterClient);
+ Scatter scatterImplementation = new ScatterFactory().getScatter(webView, scatterClient, true);
  ```
+ 
+ Third boolean parameter indicate which Scatter implementation you would like to use:
+```false``` (recommended) for socket implementation, ```true``` for js implementation. 
  
  Don`t forget to enable Javascript:
  ```java
@@ -47,7 +50,7 @@ Create ```Scatter``` object, where ```webView``` - is your WebView:
  
  Clean all after your activity/fragment destroys:
  ```java
- scatterImplementation.removeInterface();
+ scatterImplementation.onDestroy();
  ```
 
 ## Usage examples
