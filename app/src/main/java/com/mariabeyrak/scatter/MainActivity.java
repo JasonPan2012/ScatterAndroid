@@ -10,9 +10,13 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.mariabeyrak.scatter.models.requests.MsgTransaction.MsgTransactionRequestParams;
-import com.mariabeyrak.scatter.models.requests.Transaction.request.TransactionRequestParams;
+import com.mariabeyrak.Scatter;
+import com.mariabeyrak.scatter.models.requests.msgtransaction.MsgTransactionRequestParams;
+import com.mariabeyrak.scatter.models.requests.serializedtransaction.SerializedTransaction;
+import com.mariabeyrak.scatter.models.requests.serializedtransaction.SerializedTransactionRequestParams;
+import com.mariabeyrak.scatter.models.requests.transaction.request.TransactionRequestParams;
 import com.mariabeyrak.scatterandroid.R;
+import com.paytomat.core.util.HashUtil;
 import com.paytomat.eos.Eos;
 import com.paytomat.eos.PrivateKey;
 import com.paytomat.eos.signature.Signature;
@@ -25,23 +29,39 @@ public class MainActivity extends AppCompatActivity {
     private Scatter scatterImplementation;
 
     private static final String accountName = "YOUR_ACCOUNT_NAME";
-    private static final String key = "YOUR_PRIVATE_KEY";
+    private static final String privateKey = "YOUR_PRIVATE_KEY";
+    private static final String publicKey = "YOUR_PUBLIC_KEY";
 
     private ScatterClient scatterClient = new ScatterClient() {
         @Override
         public void getAccount(AccountReceived onAccountReceived) {
-            onAccountReceived.onAccountReceivedSuccessCallback(accountName);
+            onAccountReceived.onAccountReceivedSuccessCallback(accountName, publicKey);
         }
 
         @Override
         public void completeTransaction(TransactionRequestParams transactionRequestParams, TransactionCompleted onTransactionCompleted) {
-            String[] signatures = ScatterHelper.toEosTransaction(transactionRequestParams, new PrivateKey(key)).getPackedTx().getSignatures();
+            String[] signatures = ScatterHelper.toEosTransaction(transactionRequestParams, new PrivateKey(privateKey)).getPackedTx().getSignatures();
+            onTransactionCompleted.onTransactionCompletedSuccessCallback(signatures);
+        }
+
+        @Override
+        public void completeSerializedTransaction(SerializedTransactionRequestParams serializedTransactionRequestParams, SerializedTransactionCompleted onTransactionCompleted) {
+            SerializedTransaction transaction = serializedTransactionRequestParams.getTransaction();
+            String[] signatures = ScatterHelper.getSignaturesForSerializedTransaction(
+                    transaction.getSerializedTransaction(),
+                    transaction.getChainId(),
+                    new PrivateKey(privateKey));
             onTransactionCompleted.onTransactionCompletedSuccessCallback(signatures);
         }
 
         @Override
         public void completeMsgTransaction(MsgTransactionRequestParams params, MsgTransactionCompleted onMsgTransactionCompleted) {
-            Signature signature = Eos.signTransactionRaw(Hex.decode(params.getData()), new PrivateKey(key));
+            byte[] data;
+
+            if (params.getIsHash().equals("true")) data = Hex.decode(params.getData());
+            else data = HashUtil.sha256(params.getData().getBytes()).getBytes();
+
+            Signature signature = Eos.signTransactionRaw(data, new PrivateKey(privateKey));
             onMsgTransactionCompleted.onMsgTransactionCompletedSuccessCallback(signature.toString());
         }
     };
@@ -53,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
         WebView webView = findViewById(R.id.webView);
 
-        scatterImplementation = new Scatter(webView, scatterClient);
+        scatterImplementation = new ScatterFactory().getScatter(webView, scatterClient, true);
 
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setDomStorageEnabled(true);
@@ -66,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        scatterImplementation.removeInterface();
+        scatterImplementation.onDestroy();
         super.onDestroy();
     }
 
