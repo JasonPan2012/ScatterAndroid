@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
         WebView webView = findViewById(R.id.webView);
 
-        scatterImplementation = new ScatterFactory().getScatter(webView, scatterClient, true);
+        scatterImplementation = new ScatterFactory().getScatter(webView, scatterClient, false);
 
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setDomStorageEnabled(true);

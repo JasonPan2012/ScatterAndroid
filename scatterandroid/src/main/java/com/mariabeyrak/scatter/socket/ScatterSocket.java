@@ -22,9 +22,9 @@ public class ScatterSocket extends Scatter {
     public void onDestroy() {
         try {
             webSocket.stop();
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

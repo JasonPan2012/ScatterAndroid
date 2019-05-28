@@ -1,6 +1,6 @@
 package com.mariabeyrak.scatter.models.response;
 
-public enum ResponseCode {
+public enum ResultCode {
     SUCCESS(0),
     UNKNOWN_ERROR(1),
     NO_SIGNATURE(402),
@@ -12,7 +12,7 @@ public enum ResponseCode {
 
     private int code;
 
-    ResponseCode(int code) {
+    ResultCode(int code) {
         this.code = code;
     }
 

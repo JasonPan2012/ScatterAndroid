@@ -3,7 +3,7 @@ package com.mariabeyrak.scatter;
 import com.mariabeyrak.scatter.models.requests.msgtransaction.MsgTransactionRequestParams;
 import com.mariabeyrak.scatter.models.requests.serializedtransaction.SerializedTransactionRequestParams;
 import com.mariabeyrak.scatter.models.requests.transaction.request.TransactionRequestParams;
-import com.mariabeyrak.scatter.models.response.ResponseCodeInfo;
+import com.mariabeyrak.scatter.models.response.ResultCode;
 
 public abstract class ScatterClient {
 
@@ -22,19 +22,19 @@ public abstract class ScatterClient {
     public interface TransactionCompleted {
         void onTransactionCompletedSuccessCallback(String[] signatures);
 
-        void onTransactionCompletedErrorCallback(ResponseCodeInfo errorInfo, String messageToUser);
+        void onTransactionCompletedErrorCallback(ResultCode resultCode, String messageToUser);
     }
 
     public interface SerializedTransactionCompleted {
         void onTransactionCompletedSuccessCallback(String[] signatures);
 
-        void onTransactionCompletedErrorCallback(ResponseCodeInfo errorInfo, String messageToUser);
+        void onTransactionCompletedErrorCallback(ResultCode resultCode, String messageToUser);
     }
 
     public interface MsgTransactionCompleted {
         void onMsgTransactionCompletedSuccessCallback(String signature);
 
-        void onMsgTransactionCompletedErrorCallback(ResponseCodeInfo errorInfo, String messageToUser);
+        void onMsgTransactionCompletedErrorCallback(ResultCode resultCode, String messageToUser);
     }
 
     public interface PublicKeyReceived {

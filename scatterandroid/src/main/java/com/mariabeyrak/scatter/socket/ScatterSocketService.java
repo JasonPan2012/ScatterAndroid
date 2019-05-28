@@ -5,7 +5,7 @@ import com.mariabeyrak.scatter.ScatterClient;
 import com.mariabeyrak.scatter.models.requests.msgtransaction.MsgTransactionRequestParams;
 import com.mariabeyrak.scatter.models.requests.serializedtransaction.SerializedTransactionRequestParams;
 import com.mariabeyrak.scatter.models.requests.transaction.request.TransactionRequestParams;
-import com.mariabeyrak.scatter.models.response.ResponseCodeInfo;
+import com.mariabeyrak.scatter.models.response.ResultCode;
 import com.mariabeyrak.scatter.socket.models.requests.authenticate.AuthenticateResponse;
 import com.mariabeyrak.scatter.socket.models.requests.getaccount.Account;
 import com.mariabeyrak.scatter.socket.models.requests.getaccount.GetAccountResponse;
@@ -15,8 +15,7 @@ import com.mariabeyrak.scatter.socket.models.requests.transaction.TransactionRes
 import com.mariabeyrak.scatter.socket.models.response.ApiResponseData;
 import com.mariabeyrak.scatter.socket.models.response.BooleanResponse;
 import com.mariabeyrak.scatter.socket.models.response.CommandsResponse;
-import com.mariabeyrak.scatter.socket.models.response.ErrorApiResponseData;
-import com.mariabeyrak.scatter.socket.models.response.ErrorResultApiResponseData;
+import com.mariabeyrak.scatter.socket.models.response.ErrorResponse;
 import com.mariabeyrak.scatter.socket.models.response.StringResponse;
 
 import org.java_websocket.WebSocket;
@@ -200,8 +199,8 @@ public class ScatterSocketService {
             }
 
             @Override
-            public void onTransactionCompletedErrorCallback(ResponseCodeInfo errorInfo, String messageToUser) {
-                sendErrorResponse(conn, id, errorInfo.getCode().getCode(), messageToUser);
+            public void onTransactionCompletedErrorCallback(ResultCode resultCode, String messageToUser) {
+                sendErrorResponse(conn, id, resultCode, messageToUser);
             }
         };
 
@@ -224,8 +223,8 @@ public class ScatterSocketService {
             }
 
             @Override
-            public void onTransactionCompletedErrorCallback(ResponseCodeInfo errorInfo, String messageToUser) {
-                sendErrorResponse(conn, id, errorInfo.getCode().getCode(), messageToUser);
+            public void onTransactionCompletedErrorCallback(ResultCode resultCode, String messageToUser) {
+                sendErrorResponse(conn, id, resultCode, messageToUser);
             }
         };
 
@@ -249,8 +248,8 @@ public class ScatterSocketService {
             }
 
             @Override
-            public void onMsgTransactionCompletedErrorCallback(ResponseCodeInfo errorInfo, String messageToUser) {
-                sendErrorResponse(conn, id, errorInfo.getCode().getCode(), messageToUser);
+            public void onMsgTransactionCompletedErrorCallback(ResultCode resultCode, String messageToUser) {
+                sendErrorResponse(conn, id, resultCode, messageToUser);
             }
         };
 
@@ -258,11 +257,11 @@ public class ScatterSocketService {
     }
 
     private static void sendErrorResponse(WebSocket conn, String id,
-                                          Integer errorCode, String messageToUser) {
+                                          ResultCode resultCode, String messageToUser) {
         sendResponse(conn, gson.toJson(
                 new ArrayList(Arrays.asList(CommandsResponse.API,
-                        new ErrorApiResponseData(id, new ErrorResultApiResponseData(errorCode,
-                                messageToUser))
+                        new ApiResponseData(id, new ErrorResponse(resultCode.getCode(),
+                                messageToUser, resultCode.name()))
                 )))
         );
     }

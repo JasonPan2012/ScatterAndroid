@@ -9,7 +9,7 @@ import com.mariabeyrak.scatter.socket.ScatterSocket;
 public class ScatterFactory {
 
     public Scatter getScatter(WebView webView, ScatterClient scatterClient,
-                              Boolean usesScatterWebExtension) {
+                              boolean usesScatterWebExtension) {
         if (usesScatterWebExtension)
             return new ScatterJs(webView, scatterClient);
         else

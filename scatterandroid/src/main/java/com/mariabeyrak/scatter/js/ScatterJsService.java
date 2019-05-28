@@ -14,9 +14,7 @@ import com.mariabeyrak.scatter.models.requests.transaction.request.TransactionRe
 import com.mariabeyrak.scatter.models.requests.transaction.response.ReturnedFields;
 import com.mariabeyrak.scatter.models.requests.transaction.response.SignData;
 import com.mariabeyrak.scatter.models.requests.transaction.response.TransactionResponseData;
-import com.mariabeyrak.scatter.models.response.ResponseCode;
-import com.mariabeyrak.scatter.models.response.ResponseCodeInfo;
-import com.mariabeyrak.scatter.models.response.ResponseType;
+import com.mariabeyrak.scatter.models.response.ResultCode;
 
 import static com.mariabeyrak.scatter.js.models.MethodName.GET_EOS_ACCOUNT;
 import static com.mariabeyrak.scatter.js.models.MethodName.REQUEST_MSG_SIGNATURE;
@@ -70,9 +68,8 @@ final class ScatterJsService {
             }
 
             @Override
-            public void onTransactionCompletedErrorCallback(ResponseCodeInfo errorInfo, String messageToUser) {
-                sendErrorScript(webView, REQUEST_SIGNATURE, errorInfo == null ?
-                        new ResponseCodeInfo(ResponseType.UNKNOWN_ERROR, ResponseCode.UNKNOWN_ERROR) : errorInfo, messageToUser);
+            public void onTransactionCompletedErrorCallback(ResultCode resultCode, String messageToUser) {
+                sendErrorScript(webView, REQUEST_SIGNATURE, resultCode, messageToUser);
             }
         };
 
@@ -89,9 +86,8 @@ final class ScatterJsService {
             }
 
             @Override
-            public void onMsgTransactionCompletedErrorCallback(ResponseCodeInfo errorInfo, String messageToUser) {
-                sendErrorScript(webView, REQUEST_MSG_SIGNATURE, errorInfo == null ?
-                        new ResponseCodeInfo(ResponseType.UNKNOWN_ERROR, ResponseCode.UNKNOWN_ERROR) : errorInfo, messageToUser);
+            public void onMsgTransactionCompletedErrorCallback(ResultCode resultCode, String messageToUser) {
+                sendErrorScript(webView, REQUEST_MSG_SIGNATURE, resultCode, messageToUser);
             }
         };
 
@@ -99,11 +95,11 @@ final class ScatterJsService {
     }
 
     private static void sendSuccessScript(WebView webView, @MethodName.Methods String methodName, String responseData) {
-        injectJs(webView, new ScatterResponse(methodName, new ResponseCodeInfo(ResponseType.SUCCESS, ResponseCode.SUCCESS), responseData).formatSuccessResponse());
+        injectJs(webView, new ScatterResponse(methodName, ResultCode.SUCCESS, responseData).formatSuccessResponse());
     }
 
-    private static void sendErrorScript(WebView webView, @MethodName.Methods String methodName, ResponseCodeInfo responseCodeInfo, String messageToUser) {
-        injectJs(webView, new ScatterResponse(methodName, responseCodeInfo, "\"\"").formatErrorResponse(messageToUser));
+    private static void sendErrorScript(WebView webView, @MethodName.Methods String methodName, ResultCode resultCode, String messageToUser) {
+        injectJs(webView, new ScatterResponse(methodName, resultCode, "\"\"").formatErrorResponse(messageToUser));
     }
 
     static void injectJs(final WebView webView, final String script) {
