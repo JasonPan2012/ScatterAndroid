@@ -37,6 +37,12 @@ public abstract class ScatterClient {
         void onMsgTransactionCompletedErrorCallback(ResponseCodeInfo errorInfo, String messageToUser);
     }
 
+    public interface PublicKeyReceived {
+        void onPublicKeyReceivedSuccessCallback(String publicKey);
+
+        void onPublicKeyReceivedErrorCallback(Error error);
+    }
+
     public void getAppInfo(AppInfoReceived onAppInfoReceived) {
     }
 
@@ -50,5 +56,8 @@ public abstract class ScatterClient {
     }
 
     public void completeMsgTransaction(MsgTransactionRequestParams msgTransactionRequestParams, MsgTransactionCompleted onMsgTransactionMsgCompleted) {
+    }
+
+    public void getPublicKey(PublicKeyReceived onPublicKeyReceived) {
     }
 }

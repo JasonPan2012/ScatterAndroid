@@ -31,6 +31,7 @@ import static com.mariabeyrak.scatter.socket.SocketsConstants.MESSAGE_START;
 import static com.mariabeyrak.scatter.socket.models.Type.AUTHENTICATE;
 import static com.mariabeyrak.scatter.socket.models.Type.FORGET_IDENTITY;
 import static com.mariabeyrak.scatter.socket.models.Type.GET_OR_REQUEST_IDENTITY;
+import static com.mariabeyrak.scatter.socket.models.Type.GET_PUBLIC_KEY;
 import static com.mariabeyrak.scatter.socket.models.Type.GET_VERSION;
 import static com.mariabeyrak.scatter.socket.models.Type.IDENTITY_FROM_PERMISSIONS;
 import static com.mariabeyrak.scatter.socket.models.Type.LINK_ACCOUNT;
@@ -91,6 +92,10 @@ public class ScatterSocketService {
                 requestMsgSignature(conn, id, payload, scatterClient);
                 break;
             }
+            case GET_PUBLIC_KEY: {
+                getPublicKey(conn, id, scatterClient);
+                break;
+            }
             default:
                 break;
         }
@@ -143,7 +148,7 @@ public class ScatterSocketService {
                                 new ArrayList(Arrays.asList(CommandsResponse.API, new ApiResponseData(id,
                                         new GetAccountResponse(new Account[]{
                                                 new Account(accountName, "active", publicKey, "eos",
-                                                        "4667b205c6838ef70ff7988f6e8257e8be0e1284a2f59699054a018f743b1d11",
+                                                        "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906",
                                                         false)})
                                 )))
                         )
@@ -156,6 +161,27 @@ public class ScatterSocketService {
         };
 
         scatterClient.getAccount(accountReceived);
+    }
+
+    private static void getPublicKey(final WebSocket conn, final String id, ScatterClient scatterClient) {
+        ScatterClient.PublicKeyReceived publicKeyReceived = new ScatterClient.PublicKeyReceived() {
+            @Override
+            public void onPublicKeyReceivedSuccessCallback(String publicKey) {
+                sendResponse(conn,
+                        gson.toJson(
+                                new ArrayList(Arrays.asList(CommandsResponse.API, new ApiResponseData(id,
+                                        new StringResponse(publicKey)
+                                )))
+                        )
+                );
+            }
+
+            @Override
+            public void onPublicKeyReceivedErrorCallback(Error error) {
+            }
+        };
+
+        scatterClient.getPublicKey(publicKeyReceived);
     }
 
     private static void requestSignature(final WebSocket conn, final String id,
