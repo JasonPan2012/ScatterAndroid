@@ -1,6 +1,6 @@
 package com.mariabeyrak.scatter.socket.models.requests.transaction;
 
-import com.mariabeyrak.scatter.socket.models.response.ResultApiResponseData;
+import com.mariabeyrak.scatter.models.response.ResultApiResponseData;
 
 import java.util.Arrays;
 

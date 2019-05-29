@@ -1,4 +1,4 @@
-package com.mariabeyrak.scatter.socket.models.response;
+package com.mariabeyrak.scatter.models.response;
 
 public class ErrorResponse extends ResultApiResponseData {
     private int code;

@@ -5,6 +5,7 @@ import com.mariabeyrak.scatter.ScatterClient;
 import com.mariabeyrak.scatter.models.requests.msgtransaction.MsgTransactionRequestParams;
 import com.mariabeyrak.scatter.models.requests.serializedtransaction.SerializedTransactionRequestParams;
 import com.mariabeyrak.scatter.models.requests.transaction.request.TransactionRequestParams;
+import com.mariabeyrak.scatter.models.response.ErrorResponse;
 import com.mariabeyrak.scatter.models.response.ResultCode;
 import com.mariabeyrak.scatter.socket.models.requests.authenticate.AuthenticateResponse;
 import com.mariabeyrak.scatter.socket.models.requests.getaccount.Account;
@@ -15,7 +16,6 @@ import com.mariabeyrak.scatter.socket.models.requests.transaction.TransactionRes
 import com.mariabeyrak.scatter.socket.models.response.ApiResponseData;
 import com.mariabeyrak.scatter.socket.models.response.BooleanResponse;
 import com.mariabeyrak.scatter.socket.models.response.CommandsResponse;
-import com.mariabeyrak.scatter.socket.models.response.ErrorResponse;
 import com.mariabeyrak.scatter.socket.models.response.StringResponse;
 
 import org.java_websocket.WebSocket;

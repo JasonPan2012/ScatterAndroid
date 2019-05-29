@@ -11,14 +11,6 @@ public class SignData {
         this.returnedFields = returnedFields;
     }
 
-    public String[] getSignatures() {
-        return signatures;
-    }
-
-    public ReturnedFields getReturnedFields() {
-        return returnedFields;
-    }
-
     @Override
     public String toString() {
         return "SignData{" +
