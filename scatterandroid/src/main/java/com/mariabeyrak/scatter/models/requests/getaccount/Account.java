@@ -1,4 +1,4 @@
-package com.mariabeyrak.scatter.socket.models.requests.getaccount;
+package com.mariabeyrak.scatter.models.requests.getaccount;
 
 public class Account {
     private String name;

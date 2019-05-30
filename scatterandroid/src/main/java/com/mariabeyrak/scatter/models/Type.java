@@ -1,4 +1,4 @@
-package com.mariabeyrak.scatter.socket.models;
+package com.mariabeyrak.scatter.models;
 
 import android.support.annotation.StringDef;
 

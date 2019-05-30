@@ -56,12 +56,15 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void completeMsgTransaction(MsgTransactionRequestParams params, MsgTransactionCompleted onMsgTransactionCompleted) {
-            byte[] data;
+            Signature signature;
+            if (params.getIsHash()) {
+                byte[] data = Hex.decode(params.getData());
+                signature = Eos.signTransactionRaw(data, new PrivateKey(privateKey));
+            } else {
+                byte[] data = HashUtil.sha256(params.getData().getBytes()).getBytes();
+                signature = Eos.signTransactionHashed(data, new PrivateKey(privateKey));
+            }
 
-            if (params.getIsHash().equals("true")) data = Hex.decode(params.getData());
-            else data = HashUtil.sha256(params.getData().getBytes()).getBytes();
-
-            Signature signature = Eos.signTransactionRaw(data, new PrivateKey(privateKey));
             onMsgTransactionCompleted.onMsgTransactionCompletedSuccessCallback(signature.toString());
         }
     };

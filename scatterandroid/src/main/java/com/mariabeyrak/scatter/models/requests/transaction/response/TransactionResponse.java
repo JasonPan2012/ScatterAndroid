@@ -1,10 +1,8 @@
-package com.mariabeyrak.scatter.socket.models.requests.transaction;
-
-import com.mariabeyrak.scatter.models.response.ResultApiResponseData;
+package com.mariabeyrak.scatter.models.requests.transaction.response;
 
 import java.util.Arrays;
 
-public class TransactionResponse extends ResultApiResponseData {
+public class TransactionResponse {
     private String[] signatures;
     private ReturnedFields returnedFields;
 

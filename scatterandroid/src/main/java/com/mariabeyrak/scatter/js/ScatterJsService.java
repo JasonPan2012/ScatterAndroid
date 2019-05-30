@@ -5,35 +5,33 @@ import android.webkit.WebView;
 
 import com.google.gson.Gson;
 import com.mariabeyrak.scatter.ScatterClient;
-import com.mariabeyrak.scatter.js.models.MethodName;
+import com.mariabeyrak.scatter.js.models.ScatterRequest;
 import com.mariabeyrak.scatter.js.models.ScatterResponse;
 import com.mariabeyrak.scatter.models.ProtocolInfo;
+import com.mariabeyrak.scatter.models.Type;
 import com.mariabeyrak.scatter.models.requests.appinfo.AppInfoResponseData;
+import com.mariabeyrak.scatter.models.requests.getaccount.Account;
+import com.mariabeyrak.scatter.models.requests.getaccount.GetAccountResponse;
 import com.mariabeyrak.scatter.models.requests.msgtransaction.MsgTransactionRequestParams;
 import com.mariabeyrak.scatter.models.requests.transaction.request.TransactionRequestParams;
 import com.mariabeyrak.scatter.models.requests.transaction.response.ReturnedFields;
-import com.mariabeyrak.scatter.models.requests.transaction.response.SignData;
-import com.mariabeyrak.scatter.models.requests.transaction.response.TransactionResponseData;
+import com.mariabeyrak.scatter.models.requests.transaction.response.TransactionResponse;
 import com.mariabeyrak.scatter.models.response.ErrorResponse;
 import com.mariabeyrak.scatter.models.response.ResultCode;
 
-import static com.mariabeyrak.scatter.js.models.MethodName.GET_APP_INFO;
-import static com.mariabeyrak.scatter.js.models.MethodName.GET_EOS_ACCOUNT;
-import static com.mariabeyrak.scatter.js.models.MethodName.REQUEST_MSG_SIGNATURE;
-import static com.mariabeyrak.scatter.js.models.MethodName.REQUEST_SIGNATURE;
-
+//TODO Refactor
 final class ScatterJsService {
     final static private Gson gson = new Gson();
 
     private ScatterJsService() {
     }
 
-    static void getAppInfo(final WebView webView, ScatterClient scatterClient) {
+    static void getAppInfo(final WebView webView, ScatterClient scatterClient, final ScatterRequest scatterRequest) {
         ScatterClient.AppInfoReceived appInfoReceived = new ScatterClient.AppInfoReceived() {
             @Override
             public void onAppInfoReceivedSuccessCallback(String appName, String appVersion) {
                 String responseData = gson.toJson(new AppInfoResponseData(appName, appVersion, ProtocolInfo.name, ProtocolInfo.version));
-                sendResponse(webView, GET_APP_INFO, gson.toJson(
+                sendResponse(webView, scatterRequest.getCallback(), gson.toJson(
                         new ScatterResponse(ResultCode.SUCCESS.name(),
                                 responseData,
                                 ResultCode.SUCCESS.getCode())
@@ -48,12 +46,17 @@ final class ScatterJsService {
         scatterClient.getAppInfo(appInfoReceived);
     }
 
-    static void getEosAccount(final WebView webView, ScatterClient scatterClient) {
+    static void getEosAccount(final WebView webView, ScatterClient scatterClient, final ScatterRequest scatterRequest) {
         ScatterClient.AccountReceived accountReceived = new ScatterClient.AccountReceived() {
             @Override
             public void onAccountReceivedSuccessCallback(String accountName, String publicKey) {
-                sendResponse(webView, GET_EOS_ACCOUNT, gson.toJson(
-                        new ScatterResponse(ResultCode.SUCCESS.name(), gson.toJson(accountName), ResultCode.SUCCESS.getCode())
+                sendResponse(webView, scatterRequest.getCallback(), gson.toJson(
+                        new ScatterResponse(ResultCode.SUCCESS.name(), gson.toJson(
+                                new GetAccountResponse(new Account[]{
+                                        new Account(accountName, "active", publicKey, "eos",
+                                                "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906",
+                                                false)})
+                        ), ResultCode.SUCCESS.getCode())
                 ));
             }
 
@@ -65,14 +68,14 @@ final class ScatterJsService {
         scatterClient.getAccount(accountReceived);
     }
 
-    static void requestSignature(String data, final WebView webView, ScatterClient scatterClient) {
-        final TransactionRequestParams transactionRequestParams = gson.fromJson(data, TransactionRequestParams.class);
+    static void requestSignature(final WebView webView, ScatterClient scatterClient, final ScatterRequest scatterRequest) {
+        final TransactionRequestParams transactionRequestParams = gson.fromJson(scatterRequest.getParams(), TransactionRequestParams.class);
 
         ScatterClient.TransactionCompleted transactionCompleted = new ScatterClient.TransactionCompleted() {
             @Override
             public void onTransactionCompletedSuccessCallback(String[] signatures) {
-                String response = gson.toJson(new TransactionResponseData(new SignData(signatures, new ReturnedFields())));
-                sendResponse(webView, REQUEST_SIGNATURE, gson.toJson(
+                String response = gson.toJson(new TransactionResponse(signatures, new ReturnedFields()));
+                sendResponse(webView, scatterRequest.getCallback(), gson.toJson(
                         new ScatterResponse(ResultCode.SUCCESS.name(),
                                 response,
                                 ResultCode.SUCCESS.getCode())
@@ -81,40 +84,40 @@ final class ScatterJsService {
 
             @Override
             public void onTransactionCompletedErrorCallback(ResultCode resultCode, String messageToUser) {
-                sendErrorScript(webView, REQUEST_SIGNATURE, resultCode, messageToUser);
+                sendErrorScript(webView, scatterRequest.getCallback(), resultCode, messageToUser);
             }
         };
 
         scatterClient.completeTransaction(transactionRequestParams, transactionCompleted);
     }
 
-    static void requestMsgSignature(String data, final WebView webView, ScatterClient scatterClient) {
-        final MsgTransactionRequestParams msgTransactionRequestParams = gson.fromJson(data, MsgTransactionRequestParams.class);
+    static void requestMsgSignature(final WebView webView, ScatterClient scatterClient, final ScatterRequest scatterRequest) {
+        final MsgTransactionRequestParams msgTransactionRequestParams = gson.fromJson(scatterRequest.getParams(), MsgTransactionRequestParams.class);
 
         ScatterClient.MsgTransactionCompleted msgTransactionCompleted = new ScatterClient.MsgTransactionCompleted() {
             @Override
             public void onMsgTransactionCompletedSuccessCallback(String signature) {
-                sendResponse(webView, REQUEST_MSG_SIGNATURE, gson.toJson(
+                sendResponse(webView, scatterRequest.getCallback(), gson.toJson(
                         new ScatterResponse(ResultCode.SUCCESS.name(), gson.toJson(signature), ResultCode.SUCCESS.getCode())
                 ));
             }
 
             @Override
             public void onMsgTransactionCompletedErrorCallback(ResultCode resultCode, String messageToUser) {
-                sendErrorScript(webView, REQUEST_MSG_SIGNATURE, resultCode, messageToUser);
+                sendErrorScript(webView, scatterRequest.getCallback(), resultCode, messageToUser);
             }
         };
 
         scatterClient.completeMsgTransaction(msgTransactionRequestParams, msgTransactionCompleted);
     }
 
-    private static void sendErrorScript(WebView webView, @MethodName.Methods String methodName, ResultCode resultCode, String messageToUser) {
+    private static void sendErrorScript(WebView webView, @Type.ScatterWalletTypes String methodName, ResultCode resultCode, String messageToUser) {
         sendResponse(webView, methodName, gson.toJson(
                 new ErrorResponse(resultCode.getCode(), messageToUser, resultCode.name())
         ));
     }
 
-    private static void sendResponse(WebView webView, @MethodName.Methods String methodName, String response) {
+    private static void sendResponse(WebView webView, @Type.ScatterWalletTypes String methodName, String response) {
         injectJs(webView, methodName + "('" + response + "')");
     }
 

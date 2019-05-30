@@ -1,11 +1,13 @@
 package com.mariabeyrak.scatter.socket.models.response;
 
-import com.mariabeyrak.scatter.models.response.ResultApiResponseData;
+import com.google.gson.annotations.JsonAdapter;
+import com.mariabeyrak.scatter.util.RawJsonGsonAdapter;
 
 public class ApiResponseData extends ResponseData implements ResponseObject {
-    private ResultApiResponseData result;
+    @JsonAdapter(RawJsonGsonAdapter.class)
+    private String result;
 
-    public ApiResponseData(String id, ResultApiResponseData result) {
+    public ApiResponseData(String id, String result) {
         super(id);
         this.result = result;
     }

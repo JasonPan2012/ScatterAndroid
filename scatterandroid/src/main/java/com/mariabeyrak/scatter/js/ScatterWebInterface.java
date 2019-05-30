@@ -12,10 +12,10 @@ import static com.mariabeyrak.scatter.js.ScatterJsService.getAppInfo;
 import static com.mariabeyrak.scatter.js.ScatterJsService.getEosAccount;
 import static com.mariabeyrak.scatter.js.ScatterJsService.requestMsgSignature;
 import static com.mariabeyrak.scatter.js.ScatterJsService.requestSignature;
-import static com.mariabeyrak.scatter.js.models.MethodName.GET_APP_INFO;
-import static com.mariabeyrak.scatter.js.models.MethodName.GET_EOS_ACCOUNT;
-import static com.mariabeyrak.scatter.js.models.MethodName.REQUEST_MSG_SIGNATURE;
-import static com.mariabeyrak.scatter.js.models.MethodName.REQUEST_SIGNATURE;
+import static com.mariabeyrak.scatter.models.Type.GET_OR_REQUEST_IDENTITY;
+import static com.mariabeyrak.scatter.models.Type.GET_VERSION;
+import static com.mariabeyrak.scatter.models.Type.REQUEST_ARBITRARY_SIGNATURE;
+import static com.mariabeyrak.scatter.models.Type.REQUEST_SIGNATURE;
 
 class ScatterWebInterface {
     private static String TAG = "<<SS";
@@ -37,20 +37,20 @@ class ScatterWebInterface {
         ScatterRequest scatterRequest = gson.fromJson(data, ScatterRequest.class);
 
         switch (scatterRequest.getMethodName()) {
-            case GET_APP_INFO: {
-                getAppInfo(webView, scatterClient);
+            case GET_VERSION: {
+                getAppInfo(webView, scatterClient, scatterRequest);
                 break;
             }
-            case GET_EOS_ACCOUNT: {
-                getEosAccount(webView, scatterClient);
+            case GET_OR_REQUEST_IDENTITY: {
+                getEosAccount(webView, scatterClient, scatterRequest);
                 break;
             }
             case REQUEST_SIGNATURE: {
-                requestSignature(scatterRequest.getParams(), webView, scatterClient);
+                requestSignature(webView, scatterClient, scatterRequest);
                 break;
             }
-            case REQUEST_MSG_SIGNATURE: {
-                requestMsgSignature(scatterRequest.getParams(), webView, scatterClient);
+            case REQUEST_ARBITRARY_SIGNATURE: {
+                requestMsgSignature(webView, scatterClient, scatterRequest);
                 break;
             }
             default:

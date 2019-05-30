@@ -1,6 +1,6 @@
 package com.mariabeyrak.scatter.models.response;
 
-public class ErrorResponse extends ResultApiResponseData {
+public class ErrorResponse {
     private int code;
     private String message;
     private boolean isError;

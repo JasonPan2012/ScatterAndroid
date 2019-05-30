@@ -3,10 +3,10 @@ package com.mariabeyrak.scatter.models.requests.msgtransaction;
 public class MsgTransactionRequestParams {
     private String data;
     private String publicKey;
-    private String isHash;
+    private boolean isHash;
     private String whatfor;
 
-    public MsgTransactionRequestParams(String data, String publicKey, String isHash, String whatfor) {
+    public MsgTransactionRequestParams(String data, String publicKey, boolean isHash, String whatfor) {
         this.data = data;
         this.publicKey = publicKey;
         this.isHash = isHash;
@@ -21,7 +21,7 @@ public class MsgTransactionRequestParams {
         return publicKey;
     }
 
-    public String getIsHash() {
+    public boolean getIsHash() {
         return isHash;
     }
 

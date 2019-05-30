@@ -2,21 +2,18 @@ package com.mariabeyrak.scatter.socket;
 
 import com.google.gson.Gson;
 import com.mariabeyrak.scatter.ScatterClient;
+import com.mariabeyrak.scatter.models.requests.authenticate.AuthenticateResponse;
+import com.mariabeyrak.scatter.models.requests.getaccount.Account;
+import com.mariabeyrak.scatter.models.requests.getaccount.GetAccountResponse;
 import com.mariabeyrak.scatter.models.requests.msgtransaction.MsgTransactionRequestParams;
 import com.mariabeyrak.scatter.models.requests.serializedtransaction.SerializedTransactionRequestParams;
 import com.mariabeyrak.scatter.models.requests.transaction.request.TransactionRequestParams;
+import com.mariabeyrak.scatter.models.requests.transaction.response.ReturnedFields;
+import com.mariabeyrak.scatter.models.requests.transaction.response.TransactionResponse;
 import com.mariabeyrak.scatter.models.response.ErrorResponse;
 import com.mariabeyrak.scatter.models.response.ResultCode;
-import com.mariabeyrak.scatter.socket.models.requests.authenticate.AuthenticateResponse;
-import com.mariabeyrak.scatter.socket.models.requests.getaccount.Account;
-import com.mariabeyrak.scatter.socket.models.requests.getaccount.GetAccountResponse;
-import com.mariabeyrak.scatter.socket.models.requests.msgtransaction.MsgTransactionResponse;
-import com.mariabeyrak.scatter.socket.models.requests.transaction.ReturnedFields;
-import com.mariabeyrak.scatter.socket.models.requests.transaction.TransactionResponse;
 import com.mariabeyrak.scatter.socket.models.response.ApiResponseData;
-import com.mariabeyrak.scatter.socket.models.response.BooleanResponse;
 import com.mariabeyrak.scatter.socket.models.response.CommandsResponse;
-import com.mariabeyrak.scatter.socket.models.response.StringResponse;
 
 import org.java_websocket.WebSocket;
 import org.json.JSONArray;
@@ -26,17 +23,17 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static com.mariabeyrak.scatter.models.Type.AUTHENTICATE;
+import static com.mariabeyrak.scatter.models.Type.FORGET_IDENTITY;
+import static com.mariabeyrak.scatter.models.Type.GET_OR_REQUEST_IDENTITY;
+import static com.mariabeyrak.scatter.models.Type.GET_PUBLIC_KEY;
+import static com.mariabeyrak.scatter.models.Type.GET_VERSION;
+import static com.mariabeyrak.scatter.models.Type.IDENTITY_FROM_PERMISSIONS;
+import static com.mariabeyrak.scatter.models.Type.LINK_ACCOUNT;
+import static com.mariabeyrak.scatter.models.Type.REQUEST_ADD_NETWORK;
+import static com.mariabeyrak.scatter.models.Type.REQUEST_ARBITRARY_SIGNATURE;
+import static com.mariabeyrak.scatter.models.Type.REQUEST_SIGNATURE;
 import static com.mariabeyrak.scatter.socket.SocketsConstants.MESSAGE_START;
-import static com.mariabeyrak.scatter.socket.models.Type.AUTHENTICATE;
-import static com.mariabeyrak.scatter.socket.models.Type.FORGET_IDENTITY;
-import static com.mariabeyrak.scatter.socket.models.Type.GET_OR_REQUEST_IDENTITY;
-import static com.mariabeyrak.scatter.socket.models.Type.GET_PUBLIC_KEY;
-import static com.mariabeyrak.scatter.socket.models.Type.GET_VERSION;
-import static com.mariabeyrak.scatter.socket.models.Type.IDENTITY_FROM_PERMISSIONS;
-import static com.mariabeyrak.scatter.socket.models.Type.LINK_ACCOUNT;
-import static com.mariabeyrak.scatter.socket.models.Type.REQUEST_ADD_NETWORK;
-import static com.mariabeyrak.scatter.socket.models.Type.REQUEST_ARBITRARY_SIGNATURE;
-import static com.mariabeyrak.scatter.socket.models.Type.REQUEST_SIGNATURE;
 
 public class ScatterSocketService {
     final static private Gson gson = new Gson();
@@ -116,7 +113,7 @@ public class ScatterSocketService {
         sendResponse(conn,
                 gson.toJson(
                         new ArrayList(Arrays.asList(CommandsResponse.API, new ApiResponseData(id,
-                                new StringResponse("10.1.0")
+                                gson.toJson("10.1.0")
                         )))
                 )
         );
@@ -132,7 +129,7 @@ public class ScatterSocketService {
         sendResponse(conn,
                 gson.toJson(
                         new ArrayList(Arrays.asList(CommandsResponse.API, new ApiResponseData(id,
-                                new AuthenticateResponse(randomString.toString())
+                                gson.toJson(new AuthenticateResponse(randomString.toString()))
                         )))
                 )
         );
@@ -145,10 +142,10 @@ public class ScatterSocketService {
                 sendResponse(conn,
                         gson.toJson(
                                 new ArrayList(Arrays.asList(CommandsResponse.API, new ApiResponseData(id,
-                                        new GetAccountResponse(new Account[]{
+                                        gson.toJson(new GetAccountResponse(new Account[]{
                                                 new Account(accountName, "active", publicKey, "eos",
                                                         "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906",
-                                                        false)})
+                                                        false)}))
                                 )))
                         )
                 );
@@ -169,7 +166,7 @@ public class ScatterSocketService {
                 sendResponse(conn,
                         gson.toJson(
                                 new ArrayList(Arrays.asList(CommandsResponse.API, new ApiResponseData(id,
-                                        new StringResponse(publicKey)
+                                        gson.toJson(publicKey)
                                 )))
                         )
                 );
@@ -192,7 +189,7 @@ public class ScatterSocketService {
                 sendResponse(conn,
                         gson.toJson(
                                 new ArrayList(Arrays.asList(CommandsResponse.API, new ApiResponseData(id,
-                                        new TransactionResponse(signatures, new ReturnedFields())
+                                        gson.toJson(new TransactionResponse(signatures, new ReturnedFields()))
                                 )))
                         )
                 );
@@ -216,7 +213,7 @@ public class ScatterSocketService {
                 sendResponse(conn,
                         gson.toJson(
                                 new ArrayList(Arrays.asList(CommandsResponse.API, new ApiResponseData(id,
-                                        new TransactionResponse(signatures, new ReturnedFields())
+                                        gson.toJson(new TransactionResponse(signatures, new ReturnedFields()))
                                 )))
                         )
                 );
@@ -241,7 +238,7 @@ public class ScatterSocketService {
                 sendResponse(conn,
                         gson.toJson(
                                 new ArrayList(Arrays.asList(CommandsResponse.API, new ApiResponseData(id,
-                                        new MsgTransactionResponse(signature)
+                                        gson.toJson(signature)
                                 )))
                         )
                 );
@@ -260,8 +257,8 @@ public class ScatterSocketService {
                                           ResultCode resultCode, String messageToUser) {
         sendResponse(conn, gson.toJson(
                 new ArrayList(Arrays.asList(CommandsResponse.API,
-                        new ApiResponseData(id, new ErrorResponse(resultCode.getCode(),
-                                messageToUser, resultCode.name()))
+                        new ApiResponseData(id, gson.toJson(new ErrorResponse(resultCode.getCode(),
+                                messageToUser, resultCode.name())))
                 )))
         );
     }
@@ -270,7 +267,7 @@ public class ScatterSocketService {
         sendResponse(conn,
                 gson.toJson(
                         new ArrayList(Arrays.asList(CommandsResponse.API, new ApiResponseData(id,
-                                new BooleanResponse(true)
+                                gson.toJson(true)
                         )))
                 )
         );
