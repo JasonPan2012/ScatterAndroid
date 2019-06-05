@@ -11,6 +11,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.mariabeyrak.Scatter;
+import com.mariabeyrak.scatter.models.requests.authenticate.AuthenticateRequestParams;
 import com.mariabeyrak.scatter.models.requests.msgtransaction.MsgTransactionRequestParams;
 import com.mariabeyrak.scatter.models.requests.serializedtransaction.SerializedTransaction;
 import com.mariabeyrak.scatter.models.requests.serializedtransaction.SerializedTransactionRequestParams;
@@ -22,6 +23,8 @@ import com.paytomat.eos.PrivateKey;
 import com.paytomat.eos.signature.Signature;
 
 import org.bouncycastle.util.encoders.Hex;
+
+import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends AppCompatActivity {
     private static String TAG = "<<SS";
@@ -56,16 +59,29 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void completeMsgTransaction(MsgTransactionRequestParams params, MsgTransactionCompleted onMsgTransactionCompleted) {
-            Signature signature;
-            if (params.getIsHash()) {
-                byte[] data = Hex.decode(params.getData());
-                signature = Eos.signTransactionRaw(data, new PrivateKey(privateKey));
-            } else {
-                byte[] data = HashUtil.sha256(params.getData().getBytes()).getBytes();
-                signature = Eos.signTransactionHashed(data, new PrivateKey(privateKey));
-            }
+            byte[] data = (params.getIsHash()) ? Hex.decode(params.getData())
+                    : HashUtil.sha256(params.getData().getBytes(StandardCharsets.UTF_8)).getBytes();
+            Signature signature = Eos.signTransactionHashed(data, new PrivateKey(privateKey));
 
             onMsgTransactionCompleted.onMsgTransactionCompletedSuccessCallback(signature.toString());
+        }
+
+        @Override
+        public void authenticate(AuthenticateRequestParams authenticateRequestParams, MsgTransactionCompleted onMsgTransactionMsgCompleted) {
+            boolean isHash = authenticateRequestParams.getData() != null;
+            String toSign = isHash ? authenticateRequestParams.getData() : authenticateRequestParams.getOrigin();
+            String signedDataSha = Hex.toHexString(HashUtil.sha256(toSign.getBytes()).getBytes());
+            String nonceSha = Hex.toHexString(HashUtil.sha256(authenticateRequestParams.getNonce().getBytes()).getBytes());
+            byte[] hashDataDigest = (signedDataSha + nonceSha).getBytes(StandardCharsets.UTF_8);
+            byte[] hashData = HashUtil.sha256(hashDataDigest).getBytes();
+
+            MsgTransactionRequestParams params = new MsgTransactionRequestParams(
+                    Hex.toHexString(hashData),
+                    authenticateRequestParams.getPublicKey() != null ? authenticateRequestParams.getPublicKey() : "",
+                    isHash,
+                    "");
+
+            completeMsgTransaction(params, onMsgTransactionMsgCompleted);
         }
     };
 
@@ -84,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
         webView.setWebViewClient(new ScatterWebViewClient());
         webView.setWebChromeClient(new WebChromeClient());
 
-        webView.loadUrl("https://eostowergame.com");
+        webView.loadUrl("https://cryptobento.app");
     }
 
     @Override

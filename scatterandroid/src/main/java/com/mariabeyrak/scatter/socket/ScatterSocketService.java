@@ -2,7 +2,7 @@ package com.mariabeyrak.scatter.socket;
 
 import com.google.gson.Gson;
 import com.mariabeyrak.scatter.ScatterClient;
-import com.mariabeyrak.scatter.models.requests.authenticate.AuthenticateResponse;
+import com.mariabeyrak.scatter.models.requests.authenticate.AuthenticateRequestParams;
 import com.mariabeyrak.scatter.models.requests.getaccount.Account;
 import com.mariabeyrak.scatter.models.requests.getaccount.GetAccountResponse;
 import com.mariabeyrak.scatter.models.requests.msgtransaction.MsgTransactionRequestParams;
@@ -75,7 +75,7 @@ public class ScatterSocketService {
                 break;
             }
             case AUTHENTICATE: {
-                authenticate(conn, id);
+                authenticate(conn, id, payload, scatterClient);
                 break;
             }
             case REQUEST_ADD_NETWORK:
@@ -119,20 +119,28 @@ public class ScatterSocketService {
         );
     }
 
-    private static void authenticate(final WebSocket conn, final String id) {
-        StringBuilder randomString = new StringBuilder();
+    private static void authenticate(final WebSocket conn, final String id, String payload, ScatterClient scatterClient) {
+        AuthenticateRequestParams authRequestParams = gson.fromJson(payload, AuthenticateRequestParams.class);
 
-        for (int i = 0; i < 12; i++) {
-            randomString.append(getRandom());
-        }
+        ScatterClient.MsgTransactionCompleted transactionCompleted = new ScatterClient.MsgTransactionCompleted() {
+            @Override
+            public void onMsgTransactionCompletedSuccessCallback(String signature) {
+                sendResponse(conn,
+                        gson.toJson(
+                                new ArrayList(Arrays.asList(CommandsResponse.API, new ApiResponseData(id,
+                                        gson.toJson(signature)
+                                )))
+                        )
+                );
+            }
 
-        sendResponse(conn,
-                gson.toJson(
-                        new ArrayList(Arrays.asList(CommandsResponse.API, new ApiResponseData(id,
-                                gson.toJson(new AuthenticateResponse(randomString.toString()))
-                        )))
-                )
-        );
+            @Override
+            public void onMsgTransactionCompletedErrorCallback(ResultCode resultCode, String messageToUser) {
+                sendErrorResponse(conn, id, resultCode, messageToUser);
+            }
+        };
+
+        scatterClient.authenticate(authRequestParams, transactionCompleted);
     }
 
     private static void getIdentity(final WebSocket conn, final String id, ScatterClient scatterClient) {
@@ -142,7 +150,12 @@ public class ScatterSocketService {
                 sendResponse(conn,
                         gson.toJson(
                                 new ArrayList(Arrays.asList(CommandsResponse.API, new ApiResponseData(id,
-                                        gson.toJson(new GetAccountResponse(new Account[]{
+                                        gson.toJson(new GetAccountResponse(
+                                                "db4960659fb585600be9e0ec48d2e6f4826d6f929c4bcef095356ce51424608d",
+                                                publicKey,
+                                                "ScatterKit",
+                                                false,
+                                                new Account[]{
                                                 new Account(accountName, "active", publicKey, "eos",
                                                         "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906",
                                                         false)}))
@@ -275,10 +288,6 @@ public class ScatterSocketService {
 
     private static void sendResponse(WebSocket conn, String response) {
         conn.send(MESSAGE_START + response);
-    }
-
-    private static String getRandom() {
-        return Long.valueOf(Math.round(Math.random() * 8 + 1)).toString();
     }
 
 }

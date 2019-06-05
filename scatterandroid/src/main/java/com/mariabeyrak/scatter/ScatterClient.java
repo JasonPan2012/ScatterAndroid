@@ -1,5 +1,6 @@
 package com.mariabeyrak.scatter;
 
+import com.mariabeyrak.scatter.models.requests.authenticate.AuthenticateRequestParams;
 import com.mariabeyrak.scatter.models.requests.msgtransaction.MsgTransactionRequestParams;
 import com.mariabeyrak.scatter.models.requests.serializedtransaction.SerializedTransactionRequestParams;
 import com.mariabeyrak.scatter.models.requests.transaction.request.TransactionRequestParams;
@@ -43,6 +44,12 @@ public abstract class ScatterClient {
         void onPublicKeyReceivedErrorCallback(Error error);
     }
 
+    public interface AuthenticateCompleted {
+        void onAuthenticateCompletedSuccessCallback(String signatures);
+
+        void onAuthenticateCompletedErrorCallback(ResultCode resultCode, String messageToUser);
+    }
+
     public void getAppInfo(AppInfoReceived onAppInfoReceived) {
     }
 
@@ -59,5 +66,8 @@ public abstract class ScatterClient {
     }
 
     public void getPublicKey(PublicKeyReceived onPublicKeyReceived) {
+    }
+
+    public void authenticate(AuthenticateRequestParams authenticateRequestParams, MsgTransactionCompleted onMsgTransactionMsgCompleted) {
     }
 }

@@ -52,10 +52,15 @@ final class ScatterJsService {
             public void onAccountReceivedSuccessCallback(String accountName, String publicKey) {
                 sendResponse(webView, scatterRequest.getCallback(), gson.toJson(
                         new ScatterResponse(ResultCode.SUCCESS.name(), gson.toJson(
-                                new GetAccountResponse(new Account[]{
-                                        new Account(accountName, "active", publicKey, "eos",
-                                                "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906",
-                                                false)})
+                                new GetAccountResponse(
+                                        "db4960659fb585600be9e0ec48d2e6f4826d6f929c4bcef095356ce51424608d",
+                                        publicKey,
+                                        "ScatterKit",
+                                        false,
+                                        new Account[]{
+                                                new Account(accountName, "active", publicKey, "eos",
+                                                        "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906",
+                                                        false)})
                         ), ResultCode.SUCCESS.getCode())
                 ));
             }
