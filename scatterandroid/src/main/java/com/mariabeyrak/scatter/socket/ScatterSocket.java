@@ -11,6 +11,7 @@ public class ScatterSocket extends Scatter {
     public ScatterSocket(ScatterClient scatterClient) {
         super(scatterClient);
         this.webSocket = new ScatterWebSocket(scatterClient);
+        webSocket.setReuseAddr(true);
         webSocket.start();
     }
 
