@@ -3,8 +3,7 @@ package com.mariabeyrak.scatter.models.requests.authenticate;
 import android.support.annotation.Nullable;
 
 public class AuthenticateRequestParams {
-    private @Nullable
-    String nonce;
+    private String nonce;
     private @Nullable
     String data;
     private @Nullable
@@ -12,14 +11,14 @@ public class AuthenticateRequestParams {
     private @Nullable
     String origin;
 
-    public AuthenticateRequestParams(@Nullable String nonce, @Nullable String data, @Nullable String publicKey, @Nullable String origin) {
+    public AuthenticateRequestParams(String nonce, @Nullable String data,
+                                     @Nullable String publicKey, @Nullable String origin) {
         this.nonce = nonce;
         this.data = data;
         this.publicKey = publicKey;
         this.origin = origin;
     }
 
-    @Nullable
     public String getNonce() {
         return nonce;
     }
