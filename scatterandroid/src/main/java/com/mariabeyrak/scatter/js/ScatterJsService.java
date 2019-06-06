@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.mariabeyrak.scatter.ScatterClient;
 import com.mariabeyrak.scatter.js.models.ScatterRequest;
 import com.mariabeyrak.scatter.js.models.ScatterResponse;
+import com.mariabeyrak.scatter.models.EosChain;
 import com.mariabeyrak.scatter.models.ProtocolInfo;
 import com.mariabeyrak.scatter.models.Type;
 import com.mariabeyrak.scatter.models.requests.appinfo.AppInfoResponseData;
@@ -55,12 +56,12 @@ final class ScatterJsService {
                                 new GetAccountResponse(
                                         "db4960659fb585600be9e0ec48d2e6f4826d6f929c4bcef095356ce51424608d",
                                         publicKey,
-                                        "ScatterKit",
+                                        ProtocolInfo.name,
                                         false,
                                         new Account[]{
-                                                new Account(accountName, "active", publicKey, "eos",
-                                                        "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906",
-                                                        false)})
+                                                new Account(accountName, "active",
+                                                        publicKey, EosChain.chainName,
+                                                        EosChain.chainId, false)})
                         ), ResultCode.SUCCESS.getCode())
                 ));
             }

@@ -2,6 +2,8 @@ package com.mariabeyrak.scatter.socket;
 
 import com.google.gson.Gson;
 import com.mariabeyrak.scatter.ScatterClient;
+import com.mariabeyrak.scatter.models.EosChain;
+import com.mariabeyrak.scatter.models.ProtocolInfo;
 import com.mariabeyrak.scatter.models.requests.authenticate.AuthenticateRequestParams;
 import com.mariabeyrak.scatter.models.requests.getaccount.Account;
 import com.mariabeyrak.scatter.models.requests.getaccount.GetAccountResponse;
@@ -153,12 +155,12 @@ public class ScatterSocketService {
                                         gson.toJson(new GetAccountResponse(
                                                 "db4960659fb585600be9e0ec48d2e6f4826d6f929c4bcef095356ce51424608d",
                                                 publicKey,
-                                                "ScatterKit",
+                                                ProtocolInfo.name,
                                                 false,
                                                 new Account[]{
-                                                new Account(accountName, "active", publicKey, "eos",
-                                                        "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906",
-                                                        false)}))
+                                                        new Account(accountName, "active",
+                                                                publicKey, EosChain.chainName,
+                                                                EosChain.chainId, false)}))
                                 )))
                         )
                 );
